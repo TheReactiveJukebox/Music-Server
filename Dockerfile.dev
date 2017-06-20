@@ -1,5 +1,7 @@
 FROM nginx:alpine
 MAINTAINER Danny Textores <textores.danny@gmail.com>
 
+COPY nginx.conf.dev /etc/nginx/nginx.conf
+COPY mock.mp3 /etc/nginx/html/mock.mp3
+
 EXPOSE 80
-VOLUME ["/etc/nginx/html"]
