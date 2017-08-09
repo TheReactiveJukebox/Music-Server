@@ -1,21 +1,17 @@
 stages:
-- build_image
+- build
 - test
+- deploy_image
 
 variables:
   IMAGE_NAME_DEV: $CI_REGISTRY/jukebox/music-server/dev:$CI_COMMIT_REF_SLUG
   IMAGE_NAME_PRO: $CI_REGISTRY/jukebox/music-server/pro:$CI_COMMIT_REF_SLUG
 
-development:
-  stage: build_image
-  only:
-    - master
-    - ft/gitlab_ci
-    - ft/gitlab_ci_test
+images:
+  stage: build
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker build --pull -t $IMAGE_NAME_DEV -f Dockerfile.dev .
-    - docker push $IMAGE_NAME_DEV
+    - docker build --pull -t $IMAGE_NAME_PRO .
 
 nginx_syntax:
   stage: test
@@ -23,14 +19,13 @@ nginx_syntax:
     - docker run $IMAGE_NAME_PRO nginx -t
     - docker run $IMAGE_NAME_DEV nginx -t
 
-production:
-  stage: build_image
+deploy_images:
+  stage: deploy_image
   only:
     - master
     - ft/gitlab_ci
     - ft/gitlab_ci_test
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build --pull -t $IMAGE_NAME_PRO .
     - docker push $IMAGE_NAME_PRO
-
+    - docker push $IMAGE_NAME_DEV
