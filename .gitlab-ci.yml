@@ -17,6 +17,12 @@ development:
     - docker build --pull -t $IMAGE_NAME_DEV -f Dockerfile.dev .
     - docker push $IMAGE_NAME_DEV
 
+nginx_syntax:
+  stage: test
+  script:
+    - docker run $IMAGE_NAME_PRO nginx -t
+    - docker run $IMAGE_NAME_DEV nginx -t
+
 production:
   stage: build_image
   only:
@@ -28,17 +34,3 @@ production:
     - docker build --pull -t $IMAGE_NAME_PRO .
     - docker push $IMAGE_NAME_PRO
 
-
-nginx_syntax_production:
-  stage: test
-  dependencies:
-  - production
-  script:
-    - docker run $IMAGE_NAME_PRO nginx -t
-
-nginx_syntax_development:
-  stage: test
-  dependencies:
-  - development
-  script:
-    - docker run $IMAGE_NAME_DEV nginx -t
