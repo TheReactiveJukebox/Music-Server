@@ -1,0 +1,19 @@
+stages:
+- build_image
+- test_image
+
+variables:
+  IMAGE_NAME_DEV: $CI_REGISTRY/jukebox/music-server/dev:$CI_COMMIT_REF_SLUG
+  IMAGE_NAME_PRO: $CI_REGISTRY/jukebox/music-server/pro:$CI_COMMIT_REF_SLUG
+
+docker_images:
+  stage: build_image
+  script:
+    - docker build --pull -t $IMAGE_NAME_DEV -f Dockerfile.dev .
+    - docker build --pull -t $IMAGE_NAME_PRO .
+
+nginx_syntax:
+  stage: test_image
+  script:
+    - docker run $IMAGE_NAME_PRO nginx -t
+    - docker run $IMAGE_NAME_DEV nginx -t
